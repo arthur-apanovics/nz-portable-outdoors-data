@@ -1,0 +1,55 @@
+{{! TODO: alerts }}
+<table style="width: 100%">
+    {{! if present, display on top }}
+    {{#mtbDuration}}
+        <tr>
+            <th>MTB duration</th>
+            <td>{{mtbDuration}}</td>
+        </tr>
+        <tr>
+            <th>MTB Difficulty</th>
+            <td>{{mtbTrackCategory}}</td>
+        </tr>
+    {{/mtbDuration}}
+    {{#kayakingDuration}}
+        <tr>
+            <th>NULL</th>
+            <td>{{kayakingDuration}}</td>
+        </tr>
+    {{/kayakingDuration}}
+    {{#distance}}
+        <tr>
+            <th>Distance</th>
+            <td>{{distance}}</td>
+        </tr>
+    {{/distance}}
+    <tr>
+        <th>Duration</th>
+        <td>{{walkDuration}}</td>
+    </tr>
+    <tr>
+        <th>Difficulty</th>
+        <td>{{walkTrackCategory}}</td>
+    </tr>
+    <tr>
+        <th>Dogs allowed</th>
+        <td>{{dogsAllowed}}</td>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <td>{{locationString}}</td>
+    </tr>
+    <tr>
+        <th>Region</th>
+        <td>{{region}}</td>
+    </tr>
+    <tr>
+        <th>Permitted activities</th>
+        <td>{{permittedActivities}}</td>
+    </tr>
+</table>
+<a href="{{{staticLink}}}">
+    <h4>{{name}}</h4>
+</a>
+<img src="{{{introductionThumbnail}}}" alt="{{name}} image"/>
+<p>{{introduction}}</p>

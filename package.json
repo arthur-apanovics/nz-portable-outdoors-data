@@ -1,0 +1,22 @@
+{
+  "name": "doc-publisher",
+  "version": "1.0.0",
+  "description": "Converts DOC data into importable formats",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "got": "^11.1.4",
+    "html-minifier": "^4.0.0",
+    "mustache": "^4.0.1",
+    "xmlbuilder": "^15.1.1"
+  }
+}
