@@ -1,11 +1,11 @@
-import { IDocApiItemDetails, IDocApiItemOverview } from "./interfaces/DocApi";
+import { IDocItemDetails, IDocItemOverview } from "../interfaces/iDocItem";
 
-export interface IDocCampsiteOverview extends IDocApiItemOverview {
+export interface IDocCampsiteOverview extends IDocItemOverview {
   readonly status: string;
 }
 
 export interface IDocCampsiteDetails
-  extends IDocApiItemDetails,
+  extends IDocItemDetails,
     IDocCampsiteOverview {
   readonly access: string[];
   readonly activities: string[];

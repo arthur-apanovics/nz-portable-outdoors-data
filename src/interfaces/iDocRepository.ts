@@ -2,7 +2,7 @@ import IDocItem, {
   IDocItemAlerts,
   IDocItemDetails,
   IDocItemOverview
-} from "./IDocItem";
+} from "./iDocItem";
 
 export default interface IDocRepository<
   TItem extends IDocItem,

@@ -1,4 +1,4 @@
-import IDocItem, { IDocItemDetails, IDocItemOverview } from "./IDocItem";
+import IDocItem, { IDocItemDetails, IDocItemOverview } from "./iDocItem";
 
 export interface IDocTrackItemOverview extends IDocItemOverview {
   /** Coordinate array in NZGD2000 format */

@@ -1,4 +1,4 @@
-import { IDocItemDetails, IDocItemOverview } from "./IDocItem";
+import { IDocItemDetails, IDocItemOverview } from "./iDocItem";
 
 export interface IDocHutOverview extends IDocItemOverview {
   readonly status: string;

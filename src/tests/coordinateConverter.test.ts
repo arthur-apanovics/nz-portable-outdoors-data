@@ -1,6 +1,6 @@
 import { it } from "mocha";
 import { assert } from "chai";
-import { nzgdToWsg86 } from "../coord-converter";
+import { nzgdToWsg86 } from "../coordinateConverter";
 
 describe("Coordinate conversion", () => {
   it("should convert NZGD2000 coordinates to WSG86 coordinate system", function() {

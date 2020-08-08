@@ -1,4 +1,4 @@
-import IDocItem from "./interfaces/IDocItem";
+import IDocItem from "./interfaces/iDocItem";
 
 const fs = require("fs").promises;
 

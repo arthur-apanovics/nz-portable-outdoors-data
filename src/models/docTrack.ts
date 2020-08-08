@@ -1,11 +1,10 @@
 import IDocTrackItem, {
   IDocTrackItemDetails,
   IDocTrackItemOverview
-} from "../interfaces/IDocTrackItem";
-import { IDocItemAlerts } from "../interfaces/IDocItem";
-import { DocRepositoryBase } from "./DocRepositoryBase";
-import { nzgdToWsg86 } from "../coord-converter";
-// const nzgdToWsg86 = require("../coord-converter").nzgdToWsg86;
+} from "../interfaces/iDocTrackItem";
+import { IDocItemAlerts } from "../interfaces/iDocItem";
+import { DocRepositoryBase } from "./docRepositoryBase";
+import { nzgdToWsg86 } from "../coordinateConverter";
 
 export class DocTrack implements IDocTrackItem {
   readonly assetId: number | string;

@@ -1,7 +1,7 @@
 import { it } from "mocha";
 import { assert } from "chai";
 import { DocTracksRepository } from "../../models/docTrack";
-import { IDocAsset } from "../../interfaces/IDocItem";
+import { IDocAsset } from "../../interfaces/iDocItem";
 
 describe("DOC Track Repository", () => {
   require("dotenv").config();

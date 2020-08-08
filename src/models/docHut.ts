@@ -1,10 +1,10 @@
-import { IDocApiItemDetails, IDocApiItemOverview } from "./interfaces/DocApi";
+import { IDocItemDetails, IDocItemOverview } from "../interfaces/iDocItem";
 
-export interface IDocHutOverview extends IDocApiItemOverview {
+export interface IDocHutOverview extends IDocItemOverview {
   readonly status: string;
 }
 
-export interface IDocHutDetails extends IDocApiItemDetails, IDocHutOverview {
+export interface IDocHutDetails extends IDocItemDetails, IDocHutOverview {
   readonly bookable: boolean;
   readonly facilities: string[];
   readonly hutCategory: string;

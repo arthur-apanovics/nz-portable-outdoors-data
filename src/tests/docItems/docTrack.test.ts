@@ -1,6 +1,6 @@
 import { it } from "mocha";
 import { assert } from "chai";
-import { IDocTrackItemDetails } from "../../interfaces/IDocTrackItem";
+import { IDocTrackItemDetails } from "../../interfaces/iDocTrackItem";
 import { DocTrack } from "../../models/docTrack";
 
 describe("DOC Track", () => {

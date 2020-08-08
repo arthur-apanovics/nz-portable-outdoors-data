@@ -3,9 +3,9 @@ import IDocItem, {
   IDocItemAlerts,
   IDocItemDetails,
   IDocItemOverview
-} from "../interfaces/IDocItem";
+} from "../interfaces/iDocItem";
 import { promises as fs } from "fs";
-import IDocRepository from "../interfaces/IDocRepository";
+import IDocRepository from "../interfaces/iDocRepository";
 
 export abstract class DocRepositoryBase<
   TItem extends IDocItem,
