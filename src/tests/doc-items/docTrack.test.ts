@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { IDocTrackItemDetails } from "../../interfaces/IDocTrackItem";
 import { DocTrack } from "../../models/docTrack";
 
-describe("DOC Tracks", () => {
+describe("DOC Track", () => {
   const trackDetails: IDocTrackItemDetails = {
     assetId: "84c9d244-0be1-4d91-b102-bf634e9009d8",
     name: "Asbestos Cottage tracks",
@@ -41,10 +41,20 @@ describe("DOC Tracks", () => {
   const track = new DocTrack(trackDetails);
 
   it("should instantiate new DOC track correctly", () => {
-    assert.equal(track.details, trackDetails);
+    assert.equal(track.alerts, null, "alerts are null as none were passed");
+
+    const expected = Object.entries(trackDetails);
+    const values = Object.entries(track);
+    values.pop(); // remove alerts
+
+    assert.deepEqual(
+      values,
+      expected,
+      "track details are equal to passed details during instantiation"
+    );
   });
 
-  it("should convert NZGD coordinates to WSG86", () => {
+  it("should convert NZGD coordinates to WSG", () => {
     const converted = track.lineToWsg86();
     const expected = [
       [
@@ -54,6 +64,6 @@ describe("DOC Tracks", () => {
       ]
     ];
 
-    assert.equal(converted, expected);
+    assert.deepEqual(converted, expected);
   });
 });

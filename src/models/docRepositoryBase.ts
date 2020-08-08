@@ -1,61 +1,74 @@
-import IDocApiEndpoint from "../interfaces/IDocEndpoint";
 import got from "got";
 import IDocItem, {
   IDocItemAlerts,
   IDocItemDetails,
-  IDocAsset
+  IDocItemOverview
 } from "../interfaces/IDocItem";
 import { promises as fs } from "fs";
-import IRepository from "../interfaces/IRepository";
+import IDocRepository from "../interfaces/IDocRepository";
 
-export abstract class DocApiEndpointBase<T extends IDocItem>
-  implements IRepository<T> {
+export abstract class DocRepositoryBase<
+  TItem extends IDocItem,
+  TOverview extends IDocItemOverview,
+  TDetails extends IDocItemDetails
+> implements IDocRepository<TItem, TOverview, TDetails> {
   protected abstract readonly apiKey: string;
-  protected abstract readonly baseUrl: string;
-  protected abstract readonly cacheFilename: string;
-  protected abstract readonly urlSuffix: string;
+  // TODO: sendDocHttpGetRequest() does not timout if endpoint misconfigured...
+  protected abstract readonly endpointUrl: string;
 
   // getter fields
-  private _allItems: Promise<T[]>;
+  private _allItems: Promise<TOverview[]>;
   private _allAlerts: Promise<IDocItemAlerts[]>;
 
-  public getAll(): Promise<T[]> {
+  // we cannot create new generic instances in TS without passing weird
+  // constructor objects, just let the inheriting class implement this
+  public abstract async getAsync(assetId: string | number): Promise<TItem>;
+
+  public async getAllAsync(): Promise<TOverview[]> {
     if (!this._allItems) {
-      this._allItems = this.readObjectsFromCacheOrCreateAsync<T>(false);
+      this._allItems = this.readObjectsFromCacheOrCreateAsync<TOverview>(
+        this.endpointUrl,
+        "tracks"
+      );
     }
     return this._allItems;
   }
 
-  public getAllAlerts(): Promise<IDocItemAlerts[]> {
+  public async getAllAlertsAsync(): Promise<IDocItemAlerts[]> {
     if (!this._allAlerts) {
-      this._allAlerts = this.readObjectsFromCacheOrCreateAsync(true);
+      this._allAlerts = this.readObjectsFromCacheOrCreateAsync<IDocItemAlerts>(
+        `${this.endpointUrl}/alerts`,
+        "tracks-alerts"
+      );
     }
     return this._allAlerts;
   }
 
-  protected async getDetails(asset: IDocAsset): Promise<IDocItemDetails> {
-    return this.sendDocHttpGetRequest(false);
+  public async getDetailsAsync(assetId: string | number): Promise<TDetails> {
+    const endpoint = `${this.endpointUrl}/${assetId}/detail`;
+    return (await this.sendDocHttpGetRequest(endpoint)) as TDetails;
   }
 
-  protected async getAllObjectsAsync<T>(getAlerts: boolean): Promise<T[]> {
-    return (await this.sendDocHttpGetRequest(getAlerts)) as T[];
+  public async getAlertsAsync(
+    assetId: string | number
+  ): Promise<IDocItemAlerts> {
+    const endpoint = `${this.endpointUrl}/${assetId}/alerts`;
+    return (await this.sendDocHttpGetRequest(endpoint)) as IDocItemAlerts;
   }
 
   protected async readObjectsFromCacheOrCreateAsync<T>(
-    getAlerts: boolean
+    endpoint: string,
+    cacheFilename: string
   ): Promise<T[]> {
-    const path = getAlerts
-      ? this.getCachePath()
-      : `${this.getCachePath()}/alerts`;
     const expiryThreshold = 60 * 60 * 24 * 1000; // 24 hrs
-    let objects: T[] | null;
+    let objects: T[];
 
-    if (await this.isCacheExpiredOrMissing(path, expiryThreshold)) {
+    if (await this.isCacheExpiredOrMissing(cacheFilename, expiryThreshold)) {
       // update|create cache
-      objects = await this.getAllObjectsAsync(getAlerts);
-      await this.cacheObjectsAsync(objects, path);
+      objects = (await this.sendDocHttpGetRequest(endpoint)) as T[];
+      await this.cacheObjectsAsync(objects, cacheFilename);
     } else {
-      objects = JSON.parse(await fs.readFile(path, "utf8"));
+      objects = JSON.parse(await fs.readFile(cacheFilename, "utf8"));
     }
 
     return objects;
@@ -90,18 +103,13 @@ export abstract class DocApiEndpointBase<T extends IDocItem>
     }
   }
 
-  protected getCachePath(): string {
-    return `cache/${this.cacheFilename}`;
-  }
-
-  protected async sendDocHttpGetRequest(getAlerts: boolean): Promise<any> {
+  protected async sendDocHttpGetRequest(endpoint: string): Promise<unknown> {
     try {
-      const base = `${this.baseUrl}/${this.urlSuffix}`;
-      const url = getAlerts ? `${base}/alerts` : base;
-      const response = await got(url, {
+      const response = await got(endpoint, {
         method: "GET",
         responseType: "json",
         headers: { "x-api-key": this.apiKey },
+        timeout: 1000,
         retry: {
           limit: 3,
           methods: ["GET"],
@@ -117,7 +125,7 @@ export abstract class DocApiEndpointBase<T extends IDocItem>
           // TODO: remove as this is now handled by library
           console.warn("Too many requests, will try again later");
           await new Promise(resolve => setTimeout(resolve, 2000)); // sleep
-          return await this.sendDocHttpGetRequest(getAlerts);
+          return await this.sendDocHttpGetRequest(endpoint);
         default:
           throw error;
       }

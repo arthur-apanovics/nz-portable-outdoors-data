@@ -2,20 +2,20 @@ export interface IDocAsset {
   readonly assetId: number | string;
   readonly name: string;
 }
-export interface IDocApiItemOverview extends IDocAsset {
+export interface IDocItemOverview extends IDocAsset {
   readonly region: string | string[] | null;
   readonly y: number;
   readonly x: number;
 }
 
-export interface IDocApiItemDetails extends IDocApiItemOverview {
+export interface IDocItemDetails extends IDocItemOverview {
   readonly staticLink: string | URL;
   readonly locationString: string;
   readonly introduction: string;
   readonly introductionThumbnail: string | URL;
 }
 
-export interface IDocApiItemAlerts extends IDocAsset {
+export interface IDocItemAlerts extends IDocAsset {
   readonly alerts: [
     {
       displayDate: string;
@@ -25,8 +25,6 @@ export interface IDocApiItemAlerts extends IDocAsset {
   ];
 }
 
-export default interface IDocApiItem {
-  readonly overview: IDocApiItemOverview;
-  readonly details: IDocApiItemDetails;
-  readonly alerts: IDocApiItemAlerts;
+export default interface IDocItem extends IDocItemDetails {
+  readonly alerts: IDocItemAlerts;
 }

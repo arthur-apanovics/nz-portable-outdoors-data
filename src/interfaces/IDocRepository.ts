@@ -1,9 +1,17 @@
-import IDocItem, { IDocItemAlerts, IDocItemDetails } from "./IDocItem";
+import IDocItem, {
+  IDocItemAlerts,
+  IDocItemDetails,
+  IDocItemOverview
+} from "./IDocItem";
 
-export default interface IRepository<T extends IDocItem> {
-  getAll(): T[];
-  getAllAlerts(): T[];
-  get(assetId: string | number): T;
-  getDetails(assetId: string | number): IDocItemDetails;
-  getAlerts(assetId: string | number): IDocItemAlerts;
+export default interface IDocRepository<
+  TItem extends IDocItem,
+  TOverview extends IDocItemOverview,
+  TDetails
+> {
+  getAsync(assetId: string | number): Promise<TItem>;
+  getAllAsync(): Promise<TOverview[]>;
+  getAllAlertsAsync(): Promise<IDocItemAlerts[]>;
+  getDetailsAsync(assetId: string | number): Promise<TDetails>;
+  getAlertsAsync(assetId: string | number): Promise<IDocItemAlerts>;
 }
