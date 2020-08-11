@@ -8,7 +8,7 @@ import IDocItem, {
 import { promises as fs } from "fs";
 
 describe("Generic repository", () => {
-  const mockRepo = class MockRepo extends DocRepositoryBase<
+  const mockRepo = class MockDocRepository extends DocRepositoryBase<
     IDocItem,
     IDocItemOverview,
     IDocItemDetails
