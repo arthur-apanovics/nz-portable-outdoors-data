@@ -54,4 +54,10 @@ export class DocTracksRepository extends DocRepositoryBase<
     const details = await this.getDetailsAsync(assetId);
     return new DocTrack(details);
   }
+
+  public async getAllPopulatedAsync(): Promise<DocTrack[]> {
+    return (await this.getDetailsAsync(await this.getAllAsync())).map(
+      d => new DocTrack(d)
+    );
+  }
 }

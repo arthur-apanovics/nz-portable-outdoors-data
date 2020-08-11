@@ -12,7 +12,7 @@ describe("DOC Track Repository", () => {
 
   const repo = new DocTracksRepository();
 
-  it("should be configured properly", () => {
+  it("should be configured correctly", () => {
     const extracted = Object.entries(repo);
 
     const endpoint: string = extracted.find(arr => arr[0] == "endpointUrl")[1];
@@ -31,8 +31,19 @@ describe("DOC Track Repository", () => {
     assert.equal(result.name, expected.name);
   });
 
-  // // testing protected method
-  // await repo["sendDocHttpGetRequest"](
-  //   "https://api.doc.govt.nz/v1/tracks/84c9d244-0be1-4d91-b102-bf634e9009d8/detail"
-  // );
+  it("should fetch all tracks from cache or API", async () => {
+    const result = await repo.getAllAsync();
+    assert.isAbove(result.length, 10, "fetched multiple tracks");
+  });
+
+  it("should fetch all track alerts from cache or API", async () => {
+    const result = await repo.getAllAlertsAsync();
+    assert.isAbove(result.length, 10, "fetched multiple alerts");
+  });
+
+  it("should fetch all tracks as instantiated class objects with populated data", async function() {
+    const result = await repo.getAllPopulatedAsync();
+    assert.isAbove(result.length, 10, "populated multiple tracks");
+    assert.isNotEmpty(result[0], "track has values");
+  });
 });

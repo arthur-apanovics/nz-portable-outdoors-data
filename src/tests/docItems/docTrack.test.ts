@@ -42,14 +42,9 @@ describe("DOC Track", () => {
 
   it("should instantiate new DOC track correctly", () => {
     assert.equal(track.alerts, null, "alerts are null as none were passed");
-
-    const expected = Object.entries(trackDetails);
-    const values = Object.entries(track);
-    values.pop(); // remove alerts
-
-    assert.deepEqual(
-      values,
-      expected,
+    assert.containsAllKeys(
+      track,
+      trackDetails,
       "track details are equal to passed details during instantiation"
     );
   });

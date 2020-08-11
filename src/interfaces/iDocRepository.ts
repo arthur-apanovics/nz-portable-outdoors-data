@@ -13,5 +13,6 @@ export default interface IDocRepository<
   getAllAsync(): Promise<TOverview[]>;
   getAllAlertsAsync(): Promise<IDocItemAlerts[]>;
   getDetailsAsync(assetId: string | number): Promise<TDetails>;
+  getDetailsAsync(queue: TOverview[]): Promise<TDetails[]>;
   getAlertsAsync(assetId: string | number): Promise<IDocItemAlerts>;
 }
