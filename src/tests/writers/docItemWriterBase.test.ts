@@ -3,6 +3,7 @@ import { assert } from "chai";
 import { DocItemWriterBase } from "../../models/docItemWriterBase";
 import IDocItem from "../../interfaces/iDocItem";
 import xmlParser from "fast-xml-parser";
+import { promises as fs } from "fs";
 
 describe("Generic DOC item writer", () => {
   const mockWriter = class MockDocItemWriter extends DocItemWriterBase<
@@ -80,10 +81,10 @@ describe("Generic DOC item writer", () => {
     const item = mockItems[0];
     const docName = "KML test - single";
 
-    const kmlString = await writer.getKmlMasterDocumentAsync(item, docName);
-    assert.isTrue(xmlParser.validate(kmlString), "xml is valid");
+    const kmlDocument = await writer.getKmlDocumentAsync(item, docName);
+    assert.isTrue(xmlParser.validate(kmlDocument), "xml is valid");
 
-    const parsed = xmlParser.getTraversalObj(kmlString);
+    const parsed = xmlParser.getTraversalObj(kmlDocument);
 
     const kmlRoot = parsed.child["kml"][0];
     assert.isNotEmpty(kmlRoot);
@@ -111,11 +112,8 @@ describe("Generic DOC item writer", () => {
 
   it("should generate KML document given multiple objects", async () => {
     const docName = "KML test - many";
-    const kmlString = await writer.getKmlMasterDocumentAsync(
-      mockItems,
-      docName
-    );
-    assert.isTrue(xmlParser.validate(kmlString), "xml is valid");
+    const kmlDocument = await writer.getKmlDocumentAsync(mockItems, docName);
+    assert.isTrue(xmlParser.validate(kmlDocument), "xml is valid");
   });
 
   it("should generate separate document for each region from given items", async () => {
@@ -138,7 +136,43 @@ describe("Generic DOC item writer", () => {
     }
   });
 
-  it("should write documents to file", function() {
-    assert.isTrue(false, "todo: implement write file test");
+  it("should convert string to valid filename", () => {
+    const invalidFilename = " asd 123 #!@$ {}\"'></`";
+    const validFilename = writer["toValidFilename"](invalidFilename);
+    const rx = new RegExp(/^[^<>:;,?"*|/]+$/);
+    assert.lengthOf(
+      rx.exec(validFilename)[0],
+      validFilename.length,
+      "no invalid characters in filename"
+    );
+  });
+
+  it("should write single document to file", async () => {
+    const docName = "Single Item Test";
+    const kmlDocument = await writer.getKmlDocumentAsync(mockItems[0], docName);
+
+    await writer.writeKml(kmlDocument, docName);
+    const filename = writer["toValidFilename"](docName);
+    const path = `out/${filename}.kml`;
+    const stats = await fs.stat(path); // will throw if not found
+
+    assert.isTrue(stats.size > 0);
+    assert.isTrue(stats.isFile());
+    await fs.unlink(path);
+  });
+
+  it("should write document array to file", async () => {
+    const kmlDocuments = await writer.getKmlDocumentsForRegionsAsync(mockItems);
+
+    await writer.writeKml(kmlDocuments);
+    for (const key in kmlDocuments) {
+      const filename = writer["toValidFilename"](key);
+      const path = `out/${filename}.kml`;
+      const stats = await fs.stat(path); // will throw if not found
+
+      assert.isTrue(stats.size > 0);
+      assert.isTrue(stats.isFile());
+      await fs.unlink(path);
+    }
   });
 });

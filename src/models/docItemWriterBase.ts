@@ -1,7 +1,9 @@
 import IDocItem from "../interfaces/iDocItem";
 import xmlbuilder from "xmlbuilder";
-import { minify } from "html-minifier";
 import { promises as fs } from "fs";
+
+type IndexedDocumentObject = { [region: string]: xmlbuilder.XMLElement[] };
+type IndexedStringObject = { [region: string]: string };
 
 /**
  * Writes items to various file formats, e.g. XML, GPX, etc.
@@ -14,9 +16,6 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
       "xmlns:atom": "http://www.w3.org/2005/Atom"
     }
   };
-
-  protected toValidFilename = (input: string): string =>
-    input.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 
   protected abstract async getDescriptionHtmlAsync(
     item: TItem
@@ -53,9 +52,7 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
 
   protected async getKmlPlacemarkElementsIndexedByRegionAsync(
     items: TItem[]
-  ): Promise<{
-    [index: string]: xmlbuilder.XMLElement[];
-  }> {
+  ): Promise<IndexedDocumentObject> {
     // break down into individual regions indexed by region name
     const placemarkElementsByRegion = {};
     for (const item of items) {
@@ -74,7 +71,7 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
 
   public async getKmlDocumentsForRegionsAsync(
     items: TItem[]
-  ): Promise<{ [region: string]: string }> {
+  ): Promise<IndexedStringObject> {
     const regionDocuments: {
       [region: string]: any; // so that we can map without creating new object
     } = await this.getKmlPlacemarkElementsIndexedByRegionAsync(items);
@@ -91,7 +88,7 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
     return regionDocuments;
   }
 
-  public async getKmlMasterDocumentAsync(
+  public async getKmlDocumentAsync(
     items: TItem | TItem[],
     documentName: string
   ): Promise<string> {
@@ -121,29 +118,30 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
     return masterDoc.end();
   }
 
-  protected writeToFile(input: string | string[]): void {
-    throw new Error("not implemented");
+  protected toValidFilename = (input: string): string =>
+    input.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 
-    if (input instanceof Array) {
-      // for (const region in regionPlacemarks) {
-      //   const path = `out/${toFilename(region)}.kml`;
-      //
-      //   try {
-      //     // delete existing file
-      //     await fs.unlink(path);
-      //   } catch {
-      //     // file doesn't exist yet - all good
-      //   }
-      //
-      //   // write region file
-      //   await fs.appendFile(path, regionDoc.end());
-      //   console.info(`Wrote "${path}"`);
-      // }
-      //
-      // // write all regions into one file with kml folders
-      // const path = `out/${toFilename("all_tracks")}.kml`;
-      // await fs.writeFile(path, masterDoc.end());
-      // console.info(`Wrote "${path}"`);
+  private createOrOverwriteFile = async (fullPath: string, data: string) =>
+    await fs.writeFile(fullPath, data, { encoding: "utf8" });
+
+  public async writeKml(input: string, filename: string): Promise<void>;
+  public async writeKml(input: IndexedStringObject): Promise<void>;
+  public async writeKml(
+    input: string | IndexedStringObject,
+    filename?: string
+  ): Promise<void> {
+    if (typeof input === "string" && typeof filename === "string") {
+      filename = this.toValidFilename(filename);
+      const path = `out/${filename}.kml`;
+      await this.createOrOverwriteFile(path, input);
+    } else if (typeof input === "object") {
+      for (const key in input) {
+        const filename = this.toValidFilename(key);
+        const path = `out/${filename}.kml`;
+        await this.createOrOverwriteFile(path, input[key]);
+      }
+    } else {
+      throw new Error("Invalid arguments");
     }
   }
 }
