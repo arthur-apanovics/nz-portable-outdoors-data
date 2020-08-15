@@ -8,20 +8,20 @@ export interface IDocTrackItemOverview extends IDocItemOverview {
 export interface IDocTrackItemDetails
   extends IDocItemDetails,
     IDocTrackItemOverview {
-  readonly distance: string;
-  readonly dogsAllowed: string;
-  readonly kayakingDuration: string | null;
+  readonly distance: string | null;
+  readonly dogsAllowed: string | null;
+  readonly kayakingDuration: null | unknown; // checked all values manually and all were "null"
   readonly locationArray: string[];
   readonly mtbDuration: string | null;
   readonly mtbDurationCategory: string[];
   readonly mtbTrackCategory: string[];
   readonly permittedActivities: string[];
-  readonly walkDuration: string;
+  readonly walkDuration: string | null;
   readonly walkDurationCategory: string[];
   readonly walkTrackCategory: string[];
-  readonly wheelchairsAndBuggies: string | null;
+  readonly wheelchairsAndBuggies: true | null;
 }
 
 export default interface IDocTrackItem extends IDocItem, IDocTrackItemDetails {
-  lineToWsg86(): Array<[number, number][]>;
+  getLineAsWsg86(): Array<[number, number][]>;
 }

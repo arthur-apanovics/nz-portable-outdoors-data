@@ -26,7 +26,7 @@ export class DocTrack implements IDocTrackItem {
   readonly walkDuration: string;
   readonly walkDurationCategory: string[];
   readonly walkTrackCategory: string[];
-  readonly wheelchairsAndBuggies: string | null;
+  readonly wheelchairsAndBuggies: true | null;
   readonly x: number;
   readonly y: number;
 
@@ -37,7 +37,7 @@ export class DocTrack implements IDocTrackItem {
     this.alerts = alerts || null;
   }
 
-  lineToWsg86(): Array<[number, number][]> {
+  getLineAsWsg86(): Array<[number, number][]> {
     return this.line.map(segment => segment.map(nzgdToWsg86));
   }
 }

@@ -40,7 +40,7 @@ describe("DOC Track", () => {
   };
   const track = new DocTrack(trackDetails);
 
-  it("should instantiate new DOC track correctly", () => {
+  it("should instantiate new DOC track", () => {
     assert.equal(track.alerts, null, "alerts are null as none were passed");
     assert.containsAllKeys(
       track,
@@ -50,7 +50,7 @@ describe("DOC Track", () => {
   });
 
   it("should convert NZGD coordinates to WSG", () => {
-    const converted = track.lineToWsg86();
+    const converted = track.getLineAsWsg86();
     const expected = [
       [
         [172.65034155794453, -41.12962129641851],
