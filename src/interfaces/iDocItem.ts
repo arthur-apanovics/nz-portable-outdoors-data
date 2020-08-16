@@ -27,4 +27,5 @@ export interface IDocItemAlerts extends IDocAsset {
 
 export default interface IDocItem extends IDocItemDetails {
   readonly alerts: IDocItemAlerts;
+  getDetailsHtmlAsync(): Promise<string>;
 }

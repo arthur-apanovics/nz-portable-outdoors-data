@@ -17,10 +17,6 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
     }
   };
 
-  protected abstract async getDescriptionHtmlAsync(
-    item: TItem
-  ): Promise<string>;
-
   protected async getKmlPlacemarkElementAsync(
     item: TItem
   ): Promise<xmlbuilder.XMLElement> {
@@ -29,7 +25,7 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
       .element("name", null, item.name)
       .up()
       .element("description")
-      .cdata(await this.getDescriptionHtmlAsync(item));
+      .cdata(await item.getDetailsHtmlAsync());
   }
 
   protected async getKmlRegionElementAsync(

@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "commonjs",
     "target": "es5",
     "sourceMap": true,
 //    "strict": true,
     "outDir": "dist",
     "rootDir": "src",
-    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'.
+    "jsx": "react",
+    "jsxFactory": "h"
   },
   "exclude": [
     "node_modules",

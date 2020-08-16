@@ -2,31 +2,29 @@ import { it } from "mocha";
 import { assert } from "chai";
 import { IDocTrackItemDetails } from "../../interfaces/iDocTrackItem";
 import { DocTrack } from "../../models/docTrack";
+import htmlParser from "node-html-parser";
 
 describe("DOC Track", () => {
   const trackDetails: IDocTrackItemDetails = {
-    assetId: "84c9d244-0be1-4d91-b102-bf634e9009d8",
-    name: "Asbestos Cottage tracks",
-    introduction:
-      "Walk to an historic cottage (built 1897) that was home to a reclusive couple for nearly 40 years.",
-    introductionThumbnail:
-      "https://www.doc.govt.nz/thumbs/large/link/45ea6bdca3f34fd7a7700225e0895491.jpg",
-    permittedActivities: ["Walking and tramping"],
-    distance: "6 km | 12.8 km one way",
-    walkDuration: "2 hr | 4 - 5 hr one way",
-    walkDurationCategory: ["Over 4 hours"],
-    walkTrackCategory: ["Advanced"],
+    assetId: "00000000-0000-0000-0000-000000000000",
+    name: "Fake track",
+    introduction: "Fake track description",
+    introductionThumbnail: "https://via.placeholder.com/300/09f/fff.png",
+    permittedActivities: ["Flying, Mining, Submarining"],
+    distance: "666 km one way",
+    walkDuration: "256 hr | 128 hr one way",
+    walkDurationCategory: ["Over 9000 hours", "Under 10000 hours"],
+    walkTrackCategory: ["Advanced", "Mega", "Ultra"],
     wheelchairsAndBuggies: null,
     mtbDuration: null,
     mtbDurationCategory: [],
     mtbTrackCategory: [],
     kayakingDuration: null,
-    dogsAllowed: "No dogs",
-    locationString: "Located in Cobb Valley, Kahurangi National Park",
-    locationArray: ["Cobb Valley", "Kahurangi National Park"],
-    region: ["Nelson/Tasman"],
-    staticLink:
-      "https://www.doc.govt.nz/link/84c9d2440be14d91b102bf634e9009d8.aspx",
+    dogsAllowed: "Absolutely, most definitely, all dogs dogs welcome",
+    locationString: "Located in Rapture, Pacific Ocean",
+    locationArray: ["Rapture", "Pacific Ocean"],
+    region: ["Northern Hemisphere", "Earth"],
+    staticLink: "https://www.doc.govt.nz",
     x: 1574229.2296,
     y: 5446837.2456,
     line: [
@@ -60,5 +58,16 @@ describe("DOC Track", () => {
     ];
 
     assert.deepEqual(converted, expected);
+  });
+
+  it("should generate description HTML", async () => {
+    const html = await track.getDetailsHtmlAsync();
+    const parsed = htmlParser(html);
+
+    const table = parsed.querySelector("table");
+    assert.isNotEmpty(table);
+
+    const rows = table.querySelectorAll("td");
+    assert.isAbove(rows.length, 8, "contains all non-nullable fields");
   });
 });

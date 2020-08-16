@@ -1,35 +1,60 @@
 import IDocTrackItem, {
   IDocTrackItemDetails,
-  IDocTrackItemOverview
+  IDocTrackItemOverview,
 } from "../interfaces/iDocTrackItem";
 import { IDocItemAlerts } from "../interfaces/iDocItem";
 import { DocRepositoryBase } from "./docRepositoryBase";
 import { nzgdToWsg86 } from "../coordinateConverter";
+import { DocItemWriterBase } from "./docItemWriterBase";
+import trackDetails from "../components/docTrack/trackDetails";
+import { display } from "../decorators/displayName";
 
 export class DocTrack implements IDocTrackItem {
+  // non-renderable properties
   readonly assetId: number | string;
-  readonly distance: string;
-  readonly dogsAllowed: string;
-  readonly introduction: string;
-  readonly introductionThumbnail: string | URL;
-  readonly kayakingDuration: string | null;
   readonly line: Array<[number, number][]>;
-  readonly locationArray: string[];
-  readonly locationString: string;
-  readonly mtbDuration: string | null;
-  readonly mtbDurationCategory: string[];
-  readonly mtbTrackCategory: string[];
-  readonly name: string;
-  readonly permittedActivities: string[];
-  readonly region: string | string[] | null;
-  readonly staticLink: string | URL;
-  readonly walkDuration: string;
-  readonly walkDurationCategory: string[];
-  readonly walkTrackCategory: string[];
-  readonly wheelchairsAndBuggies: true | null;
   readonly x: number;
   readonly y: number;
 
+  // renderable properties
+  @display("Distance")
+  readonly distance: string;
+  @display("Dogs Allowed")
+  readonly dogsAllowed: string;
+  @display("Introduction")
+  readonly introduction: string;
+  @display("Introduction Thumbnail")
+  readonly introductionThumbnail: string | URL;
+  @display("Kayaking Duration")
+  readonly kayakingDuration: string | null;
+  @display("Location Array")
+  readonly locationArray: string[];
+  @display("Location String")
+  readonly locationString: string;
+  @display("MTB Duration")
+  readonly mtbDuration: string | null;
+  @display("MTB Duration Category")
+  readonly mtbDurationCategory: string[];
+  @display("MTB Track Category")
+  readonly mtbTrackCategory: string[];
+  @display("Name")
+  readonly name: string;
+  @display("Permitted Activities")
+  readonly permittedActivities: string[];
+  @display("Region")
+  readonly region: string | string[] | null;
+  @display("Static Link")
+  readonly staticLink: string | URL;
+  @display("Walk Duration")
+  readonly walkDuration: string;
+  @display("Walk Duration Category")
+  readonly walkDurationCategory: string[];
+  @display("Walk Track Category")
+  readonly walkTrackCategory: string[];
+  @display("Wheelchairs And Buggies")
+  readonly wheelchairsAndBuggies: true | null;
+
+  // todo: renderable
   readonly alerts: IDocItemAlerts;
 
   constructor(details: IDocTrackItemDetails, alerts?: IDocItemAlerts) {
@@ -38,7 +63,11 @@ export class DocTrack implements IDocTrackItem {
   }
 
   getLineAsWsg86(): Array<[number, number][]> {
-    return this.line.map(segment => segment.map(nzgdToWsg86));
+    return this.line.map((segment) => segment.map(nzgdToWsg86));
+  }
+
+  async getDetailsHtmlAsync(): Promise<string> {
+    return trackDetails(this);
   }
 }
 
@@ -57,7 +86,7 @@ export class DocTracksRepository extends DocRepositoryBase<
 
   public async getAllPopulatedAsync(): Promise<DocTrack[]> {
     return (await this.getDetailsAsync(await this.getAllAsync())).map(
-      d => new DocTrack(d)
+      (d) => new DocTrack(d)
     );
   }
 }
