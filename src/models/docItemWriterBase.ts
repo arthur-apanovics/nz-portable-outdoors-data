@@ -13,8 +13,8 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
     kml: {
       xmlns: "http://www.opengis.net/kml/2.2",
       "xmlns:gx": "http://www.google.com/kml/ext/2.2",
-      "xmlns:atom": "http://www.w3.org/2005/Atom"
-    }
+      "xmlns:atom": "http://www.w3.org/2005/Atom",
+    },
   };
 
   protected async getKmlPlacemarkElementAsync(
@@ -120,22 +120,33 @@ export abstract class DocItemWriterBase<TItem extends IDocItem> {
   private createOrOverwriteFile = async (fullPath: string, data: string) =>
     await fs.writeFile(fullPath, data, { encoding: "utf8" });
 
-  public async writeKml(input: string, filename: string): Promise<void>;
-  public async writeKml(input: IndexedStringObject): Promise<void>;
+  /**
+   * Writes input to KML file and returns path(s) of written file(s)
+   */
+  public async writeKml(input: string, filename: string): Promise<string>;
+  public async writeKml(
+    input: IndexedStringObject
+  ): Promise<IndexedStringObject>;
   public async writeKml(
     input: string | IndexedStringObject,
     filename?: string
-  ): Promise<void> {
+  ): Promise<string | IndexedStringObject> {
     if (typeof input === "string" && typeof filename === "string") {
       filename = this.toValidFilename(filename);
       const path = `out/${filename}.kml`;
       await this.createOrOverwriteFile(path, input);
+
+      return path;
     } else if (typeof input === "object") {
+      const paths = {};
       for (const key in input) {
         const filename = this.toValidFilename(key);
         const path = `out/${filename}.kml`;
         await this.createOrOverwriteFile(path, input[key]);
+        paths[key] = path;
       }
+
+      return paths;
     } else {
       throw new Error("Invalid arguments");
     }

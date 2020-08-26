@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { DocItemWriterBase } from "../../models/docItemWriterBase";
 import IDocItem, {
   IDocItemAlerts,
-  IDocItemDetails
+  IDocItemDetails,
 } from "../../interfaces/iDocItem";
 import xmlParser from "fast-xml-parser";
 import { promises as fs } from "fs";
@@ -52,7 +52,7 @@ describe("Generic DOC item writer", () => {
       staticLink:
         "https://www.doc.govt.nz/link/1e72f18ca04b448b95c52ce387948372.aspx",
       x: 1878578.7107,
-      y: 5678978.864
+      y: 5678978.864,
     }),
     new mockDocItem({
       assetId: "b3e33c02-1732-4820-8715-4c7b9e337bd4",
@@ -66,7 +66,7 @@ describe("Generic DOC item writer", () => {
       staticLink:
         "https://www.doc.govt.nz/link/b3e33c021732482087154c7b9e337bd4.aspx",
       x: 1270786.8283,
-      y: 5015508.1128
+      y: 5015508.1128,
     }),
     new mockDocItem({
       assetId: "d3f5348a-5667-42d2-97dc-3c14e36d1a22",
@@ -80,7 +80,7 @@ describe("Generic DOC item writer", () => {
       staticLink:
         "https://www.doc.govt.nz/link/d3f5348a566742d297dc3c14e36d1a22.aspx",
       x: 1482395.501,
-      y: 5246902.4837
+      y: 5246902.4837,
     }),
     new mockDocItem({
       assetId: "84c9d244-0be1-4d91-b102-bf634e9009d8",
@@ -94,8 +94,8 @@ describe("Generic DOC item writer", () => {
       staticLink:
         "https://www.doc.govt.nz/link/84c9d2440be14d91b102bf634e9009d8.aspx",
       x: 1574229.2296,
-      y: 5446837.2456
-    })
+      y: 5446837.2456,
+    }),
   ];
   it("should generate KML document given a single object", async () => {
     const item = mockItems[0];
@@ -140,7 +140,7 @@ describe("Generic DOC item writer", () => {
     const regionDocuments = await writer.getKmlDocumentsForRegionsAsync(
       mockItems
     );
-    const uniqueRegions = new Set(mockItems.map(i => i.region)); // https://stackoverflow.com/a/44405494/13159550
+    const uniqueRegions = new Set(mockItems.map((i) => i.region)); // https://stackoverflow.com/a/44405494/13159550
 
     assert.equal(
       Object.keys(regionDocuments).length,
@@ -184,10 +184,9 @@ describe("Generic DOC item writer", () => {
   it("should write document array to file", async () => {
     const kmlDocuments = await writer.getKmlDocumentsForRegionsAsync(mockItems);
 
-    await writer.writeKml(kmlDocuments);
+    const paths = await writer.writeKml(kmlDocuments);
     for (const key in kmlDocuments) {
-      const filename = writer["toValidFilename"](key);
-      const path = `out/${filename}.kml`;
+      const path = paths[key];
       const stats = await fs.stat(path); // will throw if not found
 
       assert.isTrue(stats.size > 0);
