@@ -1,13 +1,13 @@
 import { it } from "mocha";
 import { assert } from "chai";
-import { DocTrack, DocTrackWriter } from "../../models/docTrack";
-import IDocTrackItem, {
-  IDocTrackItemDetails
-} from "../../interfaces/iDocTrackItem";
+import { DocTrack } from "../../models/docTrack";
+import { promises as fs } from "fs";
+import xmlParser from "fast-xml-parser";
+import { DocTrackWriter } from "../../models/docTrackWriter";
 
 describe("DOC Track item writer", () => {
-  const mockTrackDetails: IDocTrackItemDetails[] = [
-    {
+  const mockTracks: DocTrack[] = [
+    new DocTrack({
       assetId: "1e72f18c-a04b-448b-95c5-2ce387948372",
       name: "Te Iringa Track",
       introduction:
@@ -38,12 +38,12 @@ describe("DOC Track item writer", () => {
           [1879546.0564, 5674912.7921],
           [1879489.5903, 5674940.2294],
           [1879501.5313, 5674971.6442],
-          [1879491.0491, 5674989.5823]
+          [1879491.0491, 5674989.5823],
           //...
-        ]
-      ]
-    },
-    {
+        ],
+      ],
+    }),
+    new DocTrack({
       assetId: "b3e33c02-1732-4820-8715-4c7b9e337bd4",
       name: "Arrowtown Chinese Settlement",
       introduction:
@@ -73,11 +73,11 @@ describe("DOC Track item writer", () => {
           [1270878.6041, 5015484.3549],
           [1270912.6121, 5015516.417],
           [1270801.5004, 5015512.3183],
-          [1270668.3947, 5015474.1655]
-        ]
-      ]
-    },
-    {
+          [1270668.3947, 5015474.1655],
+        ],
+      ],
+    }),
+    new DocTrack({
       assetId: "d3f5348a-5667-42d2-97dc-3c14e36d1a22",
       name: "Arthur’s Pass Walking Track ",
       introduction:
@@ -107,18 +107,18 @@ describe("DOC Track item writer", () => {
           [1482545.93, 5245366.17],
           [1482521.8445, 5245579.5907],
           [1482575.9942, 5245634.6137],
-          [1482591.715, 5245784.8354]
+          [1482591.715, 5245784.8354],
           //...
         ],
         [
           [1482373.8063, 5248140.87],
           [1482341.4912, 5248168.8182],
-          [1482332.7574, 5248224.7147]
+          [1482332.7574, 5248224.7147],
           //...
-        ]
-      ]
-    },
-    {
+        ],
+      ],
+    }),
+    new DocTrack({
       assetId: "84c9d244-0be1-4d91-b102-bf634e9009d8",
       name: "Asbestos Cottage tracks",
       introduction:
@@ -148,17 +148,61 @@ describe("DOC Track item writer", () => {
           [1570650.8507, 5446794.6762],
           [1570681.5853, 5446710.4702],
           [1570785.3334, 5446526.6408],
-          [1570870.6877, 5446313.5242]
+          [1570870.6877, 5446313.5242],
           //...
-        ]
-      ]
-    }
+        ],
+      ],
+    }),
   ];
+
   const writer = new DocTrackWriter();
 
-  it("should generate HTML description", function() {
-    const docTrack = new DocTrack(mockTrackDetails[0]);
-    const html = DocTrackWriter["getDescriptionHtmlAsync"](docTrack);
-    assert.isTrue(false);
+  it("should generate track xml, including line coordinates", async () => {
+    const docTrack = mockTracks[0];
+    const docName = "line coordinates";
+    const xml = await writer.getKmlDocumentAsync(docTrack, docName);
+    assert.isTrue(xmlParser.validate(xml), "valid xml");
+
+    const json = xmlParser.convertToJson(xmlParser.getTraversalObj(xml), {
+      arrayMode: false, // fast-xml-parser fails without this option
+    });
+    const placemark = json.kml.Document.kml.Folder.Placemark;
+
+    assert.exists(placemark.description, "has description");
+    assert.isNotEmpty(placemark.MultiGeometry, "has multi-geometry element");
+    assert.isNotEmpty(placemark.MultiGeometry.LineString, "has line");
+    assert.isNotEmpty(
+      placemark.MultiGeometry.LineString.coordinates,
+      "line has coordinates"
+    );
+  });
+
+  it("should write single track to KML file", async () => {
+    const docTrack = mockTracks[0];
+    const docName = "single";
+
+    const kmlDoc = await writer.getKmlDocumentAsync(docTrack, docName);
+    const path = await writer.writeKml(kmlDoc, docName);
+    const stats = await fs.stat(path); // will throw if not found
+    assert.isTrue(stats.size > 0);
+    assert.isTrue(stats.isFile());
+
+    await fs.unlink(path);
+  });
+
+  it("should write multiple tracks to KML file", async () => {
+    const kmlDocuments = await writer.getKmlDocumentsForRegionsAsync(
+      mockTracks
+    );
+
+    const paths = await writer.writeKml(kmlDocuments);
+    for (const key in kmlDocuments) {
+      const path = paths[key];
+      const stats = await fs.stat(path); // will throw if not found
+
+      assert.isTrue(stats.size > 0);
+      assert.isTrue(stats.isFile());
+      await fs.unlink(path);
+    }
   });
 });

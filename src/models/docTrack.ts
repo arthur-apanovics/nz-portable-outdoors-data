@@ -5,7 +5,6 @@ import IDocTrackItem, {
 import { IDocItemAlerts } from "../interfaces/iDocItem";
 import { DocRepositoryBase } from "./docRepositoryBase";
 import { nzgdToWsg86 } from "../coordinateConverter";
-import { DocItemWriterBase } from "./docItemWriterBase";
 import trackDetails from "../components/docTrack/trackDetails";
 import { display } from "../decorators/displayName";
 

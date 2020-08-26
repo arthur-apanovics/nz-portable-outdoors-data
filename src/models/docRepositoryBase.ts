@@ -2,7 +2,7 @@ import got from "got";
 import IDocItem, {
   IDocItemAlerts,
   IDocItemDetails,
-  IDocItemOverview
+  IDocItemOverview,
 } from "../interfaces/iDocItem";
 import { promises as fs } from "fs";
 import IDocRepository from "../interfaces/iDocRepository";
@@ -43,8 +43,6 @@ export abstract class DocRepositoryBase<
       typeof assetIdOrQueue === "string" ||
       typeof assetIdOrQueue === "number"
     ) {
-      console.log("fetching...", assetIdOrQueue);
-
       const endpoint = `${this.endpointUrl}/${assetIdOrQueue}/detail`;
       const newVar = (await this.getDocData(endpoint)) as TDetails;
       console.log("done...", assetIdOrQueue);
@@ -58,7 +56,7 @@ export abstract class DocRepositoryBase<
         for (let i = 0; i <= assetIdOrQueue.length; i += concurrent) {
           const promiseQueue = assetIdOrQueue
             .slice(0, concurrent)
-            .map(q => this.getDetailsAsync(q.assetId));
+            .map((q) => this.getDetailsAsync(q.assetId));
           const resolved = await Promise.all(promiseQueue);
           result.push(...resolved);
         }
@@ -102,7 +100,7 @@ export abstract class DocRepositoryBase<
     fullPath: string
   ): Promise<void> {
     return await fs.writeFile(fullPath, JSON.stringify(objects), {
-      encoding: "utf8"
+      encoding: "utf8",
     });
   }
 
@@ -137,14 +135,14 @@ export abstract class DocRepositoryBase<
         limit: 3,
         methods: ["GET"],
         statusCodes: [429],
-        calculateDelay: retryObject => {
+        calculateDelay: (retryObject) => {
           const retryIn = retryObject.attemptCount * 1000; // ms
           console.warn(
             `"${retryObject.error.message}" ...retrying in ${retryIn}`
           );
           return retryIn;
-        }
-      }
+        },
+      },
     };
     const response = await this.sendHttpRequest(endpoint, options);
 

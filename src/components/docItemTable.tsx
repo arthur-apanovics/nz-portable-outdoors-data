@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { getDisplayNameMetadata } from "../../decorators/displayName";
-import IDocItem from "../../interfaces/iDocItem";
+import { getDisplayNameMetadata } from "../decorators/displayName";
+import IDocItem from "../interfaces/iDocItem";
 import { JSXInternal } from "preact/src/jsx";
 
 export function getDocItemTable(item: IDocItem): JSXInternal.Element {
