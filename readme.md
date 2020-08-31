@@ -12,8 +12,9 @@ Works with Google Maps, Google Earth, Locus and any other application that suppo
 Images require internet connection to load.
 
 ### Roadmap
-* Huts
+* TypesScript (in-progress)
 * Front-end to download specific regions only
+* Huts
 * Support other file formats
 * KMZ files that include embedded content like images and brochures
 * Richer content in descriptions
